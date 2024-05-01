@@ -2,10 +2,10 @@
   {
     "id": 1,
     "question": "What chord is this?",
-    "answer": 1,
-    "questionImage": "/chord_1.jpg",
-    "userAnswer": null,
     "totalQuestions": 2,
+    "correctAnswer": 1,
+    "userAnswer": null,
+    "questionImage": "/chord_1.jpg",
     "answerOptions": [
       {
         "id": 1,
@@ -28,10 +28,10 @@
   {
     "id": 2,
     "question": "What chord is this?",
-    "answer": 1,
-    "questionImage": "/chord_2.jpg",
-    "userAnswer": null,
     "totalQuestions": 2,
+    "correctAnswer": 1,
+    "userAnswer": null,
+    "questionImage": "/chord_2.jpg",
     "answerOptions": [
       {
         "id": 1,

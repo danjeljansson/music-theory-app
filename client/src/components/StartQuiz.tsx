@@ -4,7 +4,6 @@ const StartQuiz = () => {
   const navigate = useNavigate();
 
   const handleStartQuiz = () => {
-    // Navigate to the first question; URL pattern is /q/1
     navigate("/q/1");
   };
 

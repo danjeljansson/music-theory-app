@@ -3,15 +3,16 @@ import { useState, useEffect } from "react";
 import data from "../db/db.json";
 import { useParams } from "react-router-dom";
 import NextQuestion from "./NextQuestion.tsx";
+import GoHome from "./Home.tsx";
 
 interface QuizCardProps {
   id: number;
   question: string;
-  answer: number;
+  totalQuestions: number;
+  correctAnswer: number;
+  userAnswer: null;
   questionImage: string;
   answerOptions: { id: number; text: string }[];
-  totalQuestions: number;
-  // userAnswer: number;
 }
 
 const QuizCard: React.FC = () => {
@@ -19,7 +20,7 @@ const QuizCard: React.FC = () => {
   const [quizData, setQuizData] = useState<QuizCardProps[] | null>(null);
 
   useEffect(() => {
-    const foundData = data.find((d) => d.id === parseInt(id!));
+    const foundData = data.find((d) => d.id === parseInt(id!, 10));
     console.log("Found data based on ID:", foundData);
     setQuizData(foundData ? [foundData] : null);
   }, [id]);
@@ -32,12 +33,13 @@ const QuizCard: React.FC = () => {
         {quizData.map((data: QuizCardProps) => (
           <li key={data.id}>
             <QuizCardItem
-              answer={data.answer}
               id={data.id}
-              answerOptions={data.answerOptions}
               question={data.question}
-              questionImage={data.questionImage}
               totalQuestions={data.totalQuestions}
+              correctAnswer={data.correctAnswer}
+              userAnswer={data.userAnswer}
+              questionImage={data.questionImage}
+              answerOptions={data.answerOptions}
             />
           </li>
         ))}
@@ -47,20 +49,36 @@ const QuizCard: React.FC = () => {
 };
 
 const QuizCardItem = (props: QuizCardProps) => {
-  const { question, answerOptions, answer, id, questionImage } = props;
+  const { question, answerOptions, id, questionImage, totalQuestions } = props;
+
+  const handleAnswerClick = (
+    answerOptions: number,
+    event: React.MouseEvent<HTMLButtonElement>,
+  ) => {
+    console.log(`Answer ${answerOptions} clicked`);
+    event.preventDefault();
+  };
 
   return (
     <>
-      <NextQuestion currentQuestion={id} totalQuestions={data.length} />
-      <div className="flex flex-col md:flex-row md:items-center md:justify-start">
-        <h2>{question}</h2>
-        <img src={questionImage} alt="question image" className="size-20" />
+      <GoHome />
+      <NextQuestion currentQuestion={id} totalQuestions={totalQuestions} />
+      <div>
+        <h2 dangerouslySetInnerHTML={{ __html: question }}></h2>
+        <img src={questionImage} alt="Question image" className="size-20" />
+
         <ul>
-          {answerOptions.map((answerOptions, index) => (
-            <li key={index}>
-              {id}
-              {answerOptions.text}
-              {answer}
+          {answerOptions.map((answerOptions) => (
+            <li key={answerOptions.id}>
+              <button
+                onClick={(event: React.MouseEvent<HTMLButtonElement>) =>
+                  handleAnswerClick(answerOptions.id, event)
+                }
+              >
+                <span
+                  dangerouslySetInnerHTML={{ __html: answerOptions.text }}
+                />
+              </button>
             </li>
           ))}
         </ul>
