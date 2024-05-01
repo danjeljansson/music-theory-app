@@ -1,14 +1,35 @@
-import express, { Request, Response } from "express";
+import express from "express";
 import dotenv from "dotenv";
+import db from "./config/database.config";
+import QuizInstance from "./model/model";
+import { v4 as uuidv4 } from "uuid";
+import ajvValidate from "./validator/quiz-validator";
+import validateDto from "./middleware/validate-dto";
+import next from "ajv/dist/vocabularies/next";
 
-// configures dotenv to work in your application
 dotenv.config();
-const app = express();
+
+db.sync().then(() => {
+  console.log("Database connected");
+});
 
 const PORT = process.env.PORT;
+const app = express();
+app.use(express.json());
 
-app.get("/", (request: Request, response: Response) => {
-  response.status(200).send("Hello World");
+app.get("/", (request, response) => {
+  console.log(request.body);
+  return response.send("Hello World");
+});
+
+app.post("/create", validateDto(ajvValidate), async (req, res) => {
+  const id = uuidv4();
+  try {
+    const question = await QuizInstance.create({ ...req.body, id });
+    res.json({ question, msg: "Success" });
+  } catch (e) {
+    res.status(500).json({ msg: "failed", route: "/create" });
+  }
 });
 
 app
