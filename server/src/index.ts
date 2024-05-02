@@ -5,7 +5,6 @@ import QuizInstance from "./model/model";
 import { v4 as uuidv4 } from "uuid";
 import ajvValidate from "./validator/quiz-validator";
 import validateDto from "./middleware/validate-dto";
-import next from "ajv/dist/vocabularies/next";
 
 dotenv.config();
 
@@ -29,6 +28,32 @@ app.post("/create", validateDto(ajvValidate), async (req, res) => {
     res.json({ question, msg: "Success" });
   } catch (e) {
     res.status(500).json({ msg: "failed", route: "/create" });
+  }
+});
+
+app.get("/all", async (req, res) => {
+  try {
+    const page = parseInt(req.query.page as string) || 0;
+    const size = parseInt(req.query.size as string) || 10;
+    const offset = page * size;
+    if (isNaN(page) || isNaN(size)) {
+      return res.status(400).json({
+        msg: "Invalid input, page and size should be numbers",
+        route: "/all",
+      });
+    }
+    const questions = await QuizInstance.findAndCountAll({
+      limit: size,
+      offset: offset,
+    });
+    res.json({
+      currentPage: page,
+      totalPage: Math.ceil(questions.count / size),
+      questions,
+      msg: "Success",
+    });
+  } catch (e) {
+    res.status(500).json({ msg: "failed", route: "/all" });
   }
 });
 

@@ -40,6 +40,32 @@ app.post("/create", (0, validate_dto_1.default)(quiz_validator_1.default), (req,
         res.status(500).json({ msg: "failed", route: "/create" });
     }
 }));
+app.get("/all", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const page = parseInt(req.query.page) || 0;
+        const size = parseInt(req.query.size) || 10;
+        const offset = page * size;
+        if (isNaN(page) || isNaN(size)) {
+            return res.status(400).json({
+                msg: "Invalid input, page and size should be numbers",
+                route: "/all",
+            });
+        }
+        const questions = yield model_1.default.findAndCountAll({
+            limit: size,
+            offset: offset,
+        });
+        res.json({
+            currentPage: page,
+            totalPage: Math.ceil(questions.count / size),
+            questions,
+            msg: "Success",
+        });
+    }
+    catch (e) {
+        res.status(500).json({ msg: "failed", route: "/all" });
+    }
+}));
 app
     .listen(PORT, () => {
     console.log("Server running at PORT: ", PORT);
