@@ -13,6 +13,7 @@ QuizInstance.init(
   {
     id: {
       type: DataTypes.UUIDV4,
+      defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
       autoIncrement: false,
     },

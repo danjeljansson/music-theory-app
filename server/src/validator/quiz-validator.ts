@@ -1,6 +1,5 @@
 import Ajv, { JSONSchemaType } from "ajv";
 const ajv = new Ajv({ allErrors: true });
-import ajvInstance from "./quiz-instance";
 
 interface ValidateQuestion {
   question: string;
@@ -17,16 +16,5 @@ const schema: JSONSchemaType<ValidateQuestion> = {
 };
 
 const ajvValidate = ajv.compile(schema);
-
-const data = {
-  question: "",
-  answer: "",
-};
-
-if (ajvValidate(data)) {
-  console.log();
-} else {
-  console.log(ajvValidate.errors);
-}
 
 export default ajvValidate;

@@ -14,4 +14,14 @@ const schema = {
     required: ["question", "answer"],
 };
 const ajvValidate = ajv.compile(schema);
+const data = {
+    question: "",
+    answer: "",
+};
+if (ajvValidate(data)) {
+    console.log();
+}
+else {
+    console.log(ajvValidate.errors);
+}
 exports.default = ajvValidate;
