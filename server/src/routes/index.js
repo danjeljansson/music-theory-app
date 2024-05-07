@@ -1,0 +1,15 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var express_1 = require("express");
+var index_1 = require("../controllers/index");
+var id_param_1 = require("../validator/id-param");
+var quiz_validator_1 = require("../validator/quiz-validator");
+var validate_dto_1 = require("../middleware/validate-dto");
+var router = express_1.default.Router();
+router.get("/", (0, validate_dto_1.default)(quiz_validator_1.default));
+router.get("/all", index_1.default.getPagination);
+router.get("all/:id", id_param_1.default, index_1.default.getById);
+router.post("/create", (0, validate_dto_1.default)(quiz_validator_1.default), index_1.default.createQuestion);
+router.delete("/delete/:id", id_param_1.default, index_1.default.deleteById);
+router.put("/update/:id", id_param_1.default, index_1.default.updateById);
+exports.default = router;

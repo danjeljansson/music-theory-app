@@ -1,15 +1,15 @@
 import { DataTypes, Model } from "sequelize";
 import db from "../config/database.config";
 
-interface QuizAttributes {
+interface UserAttributes {
   id: string;
-  question: string;
-  answer: string;
+  username: string;
+  password: string;
 }
 
-class QuizInstance extends Model<QuizAttributes> {}
+class UserInstance extends Model<UserAttributes> {}
 
-QuizInstance.init(
+UserInstance.init(
   {
     id: {
       type: DataTypes.UUIDV4,
@@ -17,20 +17,21 @@ QuizInstance.init(
       primaryKey: true,
       autoIncrement: false,
     },
-    question: {
+    username: {
       type: DataTypes.STRING,
       allowNull: false,
+      unique: true,
     },
-    answer: {
+    password: {
       type: DataTypes.STRING,
       allowNull: false,
     },
   },
   {
     sequelize: db,
-    freezeTableName: true,
-    modelName: "Quiz",
+    tableName: "Users",
+    modelName: "User",
   },
 );
 
-export default QuizInstance;
+export default UserInstance;

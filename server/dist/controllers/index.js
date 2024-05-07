@@ -104,5 +104,15 @@ class QuizController {
             }
         });
     }
+    none(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                res.status(404).json({ msg: "Route not found" });
+            }
+            catch (e) {
+                res.status(500).json({ msg: "failed", route: "/*" });
+            }
+        });
+    }
 }
 exports.default = new QuizController();

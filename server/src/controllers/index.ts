@@ -12,6 +12,7 @@ class QuizController {
       res.status(500).json({ msg: "failed", route: "/create" });
     }
   }
+
   async getPagination(req: Request, res: Response) {
     try {
       const page = parseInt(req.query.page as string) || 0;
@@ -77,6 +78,13 @@ class QuizController {
       res.json({ msg: "Success" });
     } catch (e) {
       res.status(500).json({ msg: "failed", route: "/delete" });
+    }
+  }
+  async none(req: Request, res: Response) {
+    try {
+      res.status(404).json({ msg: "Route not found" });
+    } catch (e) {
+      res.status(500).json({ msg: "failed", route: "/*" });
     }
   }
 }

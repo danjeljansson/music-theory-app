@@ -7,5 +7,5 @@ const express_1 = __importDefault(require("express"));
 const index_1 = __importDefault(require("./routes/index"));
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
-app.use("/", index_1.default);
+app.use("/api/", index_1.default);
 exports.default = app;

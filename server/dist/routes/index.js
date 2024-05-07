@@ -5,6 +5,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const index_1 = __importDefault(require("../controllers/index"));
+const UserController_1 = __importDefault(require("../controllers/UserController"));
+const user_validator_1 = __importDefault(require("../validator/user-validator"));
 const id_param_1 = __importDefault(require("../validator/id-param"));
 const quiz_validator_1 = __importDefault(require("../validator/quiz-validator"));
 const validate_dto_1 = __importDefault(require("../middleware/validate-dto"));
@@ -15,4 +17,9 @@ router.get("all/:id", id_param_1.default, index_1.default.getById);
 router.post("/create", (0, validate_dto_1.default)(quiz_validator_1.default), index_1.default.createQuestion);
 router.delete("/delete/:id", id_param_1.default, index_1.default.deleteById);
 router.put("/update/:id", id_param_1.default, index_1.default.updateById);
+router.post("/register", user_validator_1.default, UserController_1.default.createUser);
+router.all("/*", index_1.default.none);
+// router.post("/login", ajvValidateUser, UserController.loginUser);
+//
+// router.post("/logout", UserController.logoutUser);
 exports.default = router;

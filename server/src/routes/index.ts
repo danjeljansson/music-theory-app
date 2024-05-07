@@ -1,5 +1,7 @@
 import express from "express";
 import QuizController from "../controllers/index";
+import UserController from "../controllers/UserController";
+import ajvValidateUser from "../validator/user-validator";
 import ajvValidateIdParam from "../validator/id-param";
 import ajvValidate from "../validator/quiz-validator";
 import validateDto from "../middleware/validate-dto";
@@ -17,5 +19,13 @@ router.post("/create", validateDto(ajvValidate), QuizController.createQuestion);
 router.delete("/delete/:id", ajvValidateIdParam, QuizController.deleteById);
 
 router.put("/update/:id", ajvValidateIdParam, QuizController.updateById);
+
+router.post("/register", ajvValidateUser, UserController.createUser);
+
+router.all("/*", QuizController.none);
+
+// router.post("/login", ajvValidateUser, UserController.loginUser);
+//
+// router.post("/logout", UserController.logoutUser);
 
 export default router;
