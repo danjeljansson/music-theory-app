@@ -18,12 +18,12 @@ UserInstance.init(
       autoIncrement: false,
     },
     username: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(),
       allowNull: false,
       unique: true,
     },
     password: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(),
       allowNull: false,
     },
   },

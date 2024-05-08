@@ -10,26 +10,22 @@ interface ValidateUser {
 const schema: JSONSchemaType<ValidateUser> = {
   type: "object",
   properties: {
-    username: { type: "string", minLength: 4 },
-    password: { type: "string", minLength: 4 },
+    username: { type: "string", minLength: 4, maxLength: 50 },
+    password: { type: "string", minLength: 4, maxLength: 50 },
   },
   required: ["username", "password"],
 };
 
-const ValidateUser = ajv.compile(schema);
+const validateUser = ajv.compile(schema);
 
 function ajvValidateUser(req: Request, res: Response, next: NextFunction) {
-  const valid = ValidateUser({
-    username: req.body.username,
-    password: req.body.password,
-  });
+  const valid = validateUser(req.body);
+  console.log(req.body);
   if (!valid) {
-    res
-      .status(400)
-      .json({
-        errors: schema.errors,
-        msg: "Correct username and password required.",
-      });
+    res.status(400).json({
+      errors: validateUser.errors,
+      msg: "Correct username and password required.",
+    });
   } else {
     next();
   }

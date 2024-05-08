@@ -2,24 +2,24 @@ import { Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import UserInstance from "../model/model";
+import UserInstance from "../model/user";
 
 class UserController {
   async createUser(req: Request, res: Response) {
     const id = uuidv4();
     const { username, password } = req.body;
     const hashedPassword = bcrypt.hashSync(password, 10);
-
+    console.log(req.body);
     try {
       const newUser = await UserInstance.create({
         ...req.body,
         id,
         username,
-        hashedPassword,
+        password: hashedPassword,
       });
       res.status(200).json({ newUser, msg: "User created!" });
     } catch (error) {
-      console.log(error);
+      console.log(error, req.body);
       res.status(500).json({ msg: "failed", route: "/register", error: error });
     }
   }

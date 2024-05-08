@@ -84,7 +84,7 @@ class QuizController {
     try {
       res.status(404).json({ msg: "Route not found" });
     } catch (e) {
-      res.status(500).json({ msg: "failed", route: "/*" });
+      res.status(500).json({ msg: "failed", route: "/*  " });
     }
   }
 }
