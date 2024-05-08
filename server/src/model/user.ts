@@ -7,7 +7,11 @@ interface UserAttributes {
   password: string;
 }
 
-class UserInstance extends Model<UserAttributes> {}
+class UserInstance extends Model<UserAttributes> implements UserAttributes {
+  public id!: string;
+  public username!: string;
+  public password!: string;
+}
 
 UserInstance.init(
   {

@@ -22,6 +22,8 @@ router.put("/update/:id", ajvValidateIdParam, QuizController.updateById);
 
 router.post("/register", ajvValidateUser, UserController.createUser);
 
+router.post("/login", ajvValidateUser, UserController.loginUser);
+
 router.all("/*", QuizController.none);
 
 // router.post("/login", ajvValidateUser, UserController.loginUser);

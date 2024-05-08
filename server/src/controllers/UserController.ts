@@ -2,7 +2,10 @@ import { Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
 import UserInstance from "../model/user";
+
+dotenv.config();
 
 class UserController {
   async createUser(req: Request, res: Response) {
@@ -24,27 +27,25 @@ class UserController {
     }
   }
 
-  async userLogin(req: Request, res: Response) {
-    try {
-      res.status(200).json({
-        msg: "User logged in!",
-        code: 200,
-      });
-    } catch (error) {
-      console.log(error);
-      res.status(500).json({ msg: "failed", route: "/login" });
-    }
-  }
-
-  async userLogout(req: Request, res: Response) {
-    try {
-      res.status(200).json({
-        msg: "User logged out!",
-        code: 200,
-      });
-    } catch (error) {
-      console.log(error);
-      res.status(500).json({ msg: "failed", route: "/logout" });
+  async loginUser(req: Request, res: Response) {
+    const { username, password } = req.body;
+    const user = await UserInstance.findOne({ where: { username } });
+    if (!user) {
+      res.status(404).json({ msg: "User not found", route: "/login" });
+    } else {
+      const isPasswordValid = bcrypt.compareSync(password, user.password);
+      if (isPasswordValid) {
+        const accessToken = jwt.sign(
+          { id: user.id },
+          process.env.JWT_SECRET as string,
+          {
+            expiresIn: "1d",
+          },
+        );
+        res.status(200).json({ accessToken, msg: "User logged in!" });
+      } else {
+        res.status(401).json({ msg: "Invalid password", route: "/login" });
+      }
     }
   }
 }
