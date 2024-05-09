@@ -1,10 +1,12 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import QuizController from "../controllers/index";
 import UserController from "../controllers/UserController";
 import ajvValidateUser from "../validator/user-validator";
 import ajvValidateIdParam from "../validator/id-param";
 import ajvValidate from "../validator/quiz-validator";
 import validateDto from "../middleware/validate-dto";
+import authenticateToken from "../validator/cookie-validate";
+import logActiveUser from "../middleware/UserActivity";
 
 const router = express.Router();
 
@@ -24,10 +26,17 @@ router.post("/register", ajvValidateUser, UserController.createUser);
 
 router.post("/login", ajvValidateUser, UserController.loginUser);
 
+router.post("/logout", UserController.logOutUser);
+
+router.get(
+  "/protected",
+  authenticateToken,
+  logActiveUser,
+  UserController.getUsers,
+);
+
 router.all("/*", QuizController.none);
 
-// router.post("/login", ajvValidateUser, UserController.loginUser);
 //
-// router.post("/logout", UserController.logoutUser);
 
 export default router;

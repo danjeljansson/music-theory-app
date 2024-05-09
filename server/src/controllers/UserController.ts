@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
 import UserInstance from "../model/user";
 
 dotenv.config();
@@ -42,12 +43,31 @@ class UserController {
             expiresIn: "1d",
           },
         );
+
+        res.cookie("token", accessToken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          maxAge: 24 * 60 * 60 * 1000,
+        });
         res.status(200).json({ accessToken, msg: "User logged in!" });
       } else {
         res.status(401).json({ msg: "Invalid password", route: "/login" });
       }
     }
   }
-}
 
+  async logOutUser(req: Request, res: Response) {
+    res.clearCookie("token");
+    res.status(200).json({ msg: "User logged out!" });
+  }
+
+  async getUsers(req: Request, res: Response) {
+    try {
+      const users = await UserInstance.findAll();
+      res.status(200).json(users);
+    } catch (error) {
+      res.status(500).json({ msg: "failed", route: "/users", error: error });
+    }
+  }
+}
 export default new UserController();
