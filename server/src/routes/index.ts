@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import express from "express";
 import QuizController from "../controllers/index";
 import UserController from "../controllers/UserController";
 import ajvValidateUser from "../validator/user-validator";
@@ -30,8 +30,8 @@ router.post("/logout", UserController.logOutUser);
 
 router.get(
   "/protected",
-  authenticateToken,
   logActiveUser,
+  authenticateToken,
   UserController.getUsers,
 );
 

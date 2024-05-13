@@ -1,15 +1,47 @@
 import { Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
-import QuizInstance from "../model/model";
+import QuestionInstance from "../model/QuestionModel";
+import AnswerInstance from "../model/AnswerModel";
+
+interface Answer {
+  answerOption: string;
+  isCorrect: boolean;
+}
 
 class QuizController {
   async createQuestion(req: Request, res: Response) {
-    const id = uuidv4();
+    const { question: questionText, answer: answerText } = req.body;
+
     try {
-      const question = await QuizInstance.create({ ...req.body, id });
-      res.json({ question, msg: "Success" });
+      console.log("Incoming answer:", answerText);
+
+      // Create the question
+      const question = await QuestionInstance.create({
+        id: uuidv4(),
+        question: questionText,
+      });
+
+      // Ensure 'answerText' is an array
+      if (Array.isArray(answerText)) {
+        const createdAnswers = await Promise.all(
+          answerText.map(async (answer: Answer) => {
+            return await AnswerInstance.create({
+              id: uuidv4(),
+              questionId: question.id,
+              answerOption: answer.answerOption,
+              isCorrect: answer.isCorrect,
+            });
+          }),
+        );
+        res.json({ question, answers: createdAnswers, msg: "Success" });
+      } else {
+        throw new Error("Answers must be provided as an array");
+      }
+
+      // Parse each answer option and create AnswerInstances
     } catch (e) {
-      res.status(500).json({ msg: "failed", route: "/create" });
+      console.error("Error creating question:", e);
+      res.status(500).json({ msg: "failed", route: "/create", error: e });
     }
   }
 
@@ -24,7 +56,7 @@ class QuizController {
           route: "/all",
         });
       }
-      const questions = await QuizInstance.findAndCountAll({
+      const questions = await QuestionInstance.findAndCountAll({
         limit: size,
         offset: offset,
       });
@@ -42,7 +74,7 @@ class QuizController {
   async getById(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const question = await QuizInstance.findOne({ where: { id: id } });
+      const question = await QuestionInstance.findOne({ where: { id: id } });
       if (!question) {
         return res.status(404).json({ msg: "Question not found" });
       }
@@ -55,7 +87,7 @@ class QuizController {
   async updateById(req: Request, res: Response) {
     try {
       const id = req.params.id;
-      const question = await QuizInstance.findOne({ where: { id } });
+      const question = await QuestionInstance.findOne({ where: { id } });
       if (!question) {
         return res.status(404).json({ msg: "Question not found" });
       }
@@ -70,7 +102,7 @@ class QuizController {
   async deleteById(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const question = await QuizInstance.findOne({ where: { id } });
+      const question = await QuestionInstance.findOne({ where: { id } });
       if (!question) {
         return res.status(404).json({ msg: "Question not found" });
       }
