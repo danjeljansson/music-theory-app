@@ -1,5 +1,4 @@
-import React from "react";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import data from "../db/db.json";
 import { useParams } from "react-router-dom";
 import NextQuestion from "./NextQuestion.tsx";
