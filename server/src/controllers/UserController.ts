@@ -3,7 +3,6 @@ import { v4 as uuidv4 } from "uuid";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-import cookieParser from "cookie-parser";
 import UserInstance from "../model/user";
 
 dotenv.config();
@@ -57,7 +56,7 @@ class UserController {
   }
 
   async logOutUser(req: Request, res: Response) {
-    res.clearCookie("token");
+    res.clearCookie("token", { path: "/" });
     res.status(200).json({ msg: "User logged out!" });
   }
 
