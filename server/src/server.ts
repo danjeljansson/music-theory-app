@@ -1,6 +1,7 @@
 import db from "./config/database.config";
 import app from "./app";
 import dotenv from "dotenv";
+import { QuestionInstance, AnswerInstance } from "./model/Association";
 dotenv.config();
 
 db.sync()

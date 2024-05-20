@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
-import QuestionInstance from "../model/QuestionModel";
-import AnswerInstance from "../model/AnswerModel";
+import { QuestionInstance, AnswerInstance } from "../model/Association";
 
 interface Answer {
   answerOption: string;
@@ -81,6 +80,28 @@ class QuizController {
       res.json({ question, msg: "Success" });
     } catch (e) {
       res.status(500).json({ msg: "failed", route: "/all:id" });
+    }
+  }
+
+  async getRandomQuestion(req: Request, res: Response) {
+    try {
+      const totalQuestions = await QuestionInstance.count();
+      const randomIndex = Math.floor(Math.random() * totalQuestions);
+
+      const randomQuestion = await QuestionInstance.findOne({
+        offset: randomIndex,
+        attributes: ["id", "question"],
+        include: [{ model: AnswerInstance, as: "answers" }],
+      });
+
+      if (!randomQuestion) {
+        return res.status(404).json({ msg: "No questions found" });
+      }
+
+      res.json({ question: randomQuestion, msg: "Success" });
+    } catch (error) {
+      console.error("Error fetching random question:", error);
+      res.status(500).json({ msg: "Failed to fetch random question" });
     }
   }
 

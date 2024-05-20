@@ -1,7 +1,6 @@
 import { DataTypes, Model } from "sequelize";
 import db from "../config/database.config";
-import AnswerModel from "./AnswerModel";
-import Sequelize from "sequelize";
+import AnswerInstance from "./AnswerModel";
 
 interface QuestionAttributes {
   id: string;
@@ -11,13 +10,7 @@ interface QuestionAttributes {
 class QuestionInstance extends Model<QuestionAttributes> {
   public id!: string;
   public question!: string;
-  answer?: AnswerModel[];
-
-  public getAnswers!: Sequelize.HasManyGetAssociationsMixin<AnswerModel>;
-  public addAnswer!: Sequelize.HasManyAddAssociationMixin<AnswerModel, string>;
-  public hasAnswer!: Sequelize.HasManyHasAssociationMixin<AnswerModel, string>;
-  public countAnswers!: Sequelize.HasManyCountAssociationsMixin;
-  public createAnswer!: Sequelize.HasManyCreateAssociationMixin<AnswerModel>;
+  public readonly answers?: AnswerInstance[];
 }
 
 QuestionInstance.init(

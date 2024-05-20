@@ -14,7 +14,9 @@ router.get("/", validateDto(ajvValidate));
 
 router.get("/all", QuizController.getPagination);
 
-router.get("all/:id", ajvValidateIdParam, QuizController.getById);
+router.get("/all/:id", ajvValidateIdParam, QuizController.getById);
+
+router.get("/random", QuizController.getRandomQuestion);
 
 router.post("/create", validateDto(ajvValidate), QuizController.createQuestion);
 

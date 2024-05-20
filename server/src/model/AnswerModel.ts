@@ -24,11 +24,8 @@ AnswerInstance.init(
       primaryKey: true,
     },
     questionId: {
-      type: DataTypes.STRING,
-      references: {
-        model: QuestionInstance,
-        key: "id",
-      },
+      type: DataTypes.UUIDV4,
+      allowNull: false,
     },
     answerOption: {
       type: DataTypes.STRING,
@@ -45,5 +42,10 @@ AnswerInstance.init(
     tableName: "answers",
   },
 );
+
+AnswerInstance.belongsTo(QuestionInstance, {
+  foreignKey: "questionId",
+  as: "belongsToQuestion",
+});
 
 export default AnswerInstance;

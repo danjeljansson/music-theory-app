@@ -7,4 +7,9 @@ QuestionInstance.hasMany(AnswerInstance, {
   as: "answers",
 });
 
+AnswerInstance.belongsTo(QuestionInstance, {
+  foreignKey: "questionId",
+  as: "question",
+});
+
 export { QuestionInstance, AnswerInstance };
