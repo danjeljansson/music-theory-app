@@ -1,42 +1,66 @@
-import {
-  BrowserRouter as Router,
-  Route,
-  Routes,
-  Navigate,
-} from "react-router-dom";
-import StartButton from "./components/StartQuiz";
+import React, { useState, useEffect } from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import Cookies from "js-cookie";
+import { QuestionData } from "./types/types";
+import StartQuiz from "./components/StartQuiz";
 import QuizCard from "./components/QuizCard";
+import Login from "./components/Login";
+import LogOut from "./components/LogOut";
+import PrivateRoute from "./components/PrivateRoute";
+import SignUp from "./components/SignUp";
 import GoHome from "./components/Home.tsx";
-import Login from "./components/Login.tsx";
-import SignUpForm from "./components/SignUp.tsx";
-import ReactModal from "react-modal";
-import { useState } from "react";
-ReactModal.setAppElement("#root");
 
-function App() {
+const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [quizData, setQuizData] = useState<QuestionData | null>(null);
+
+  useEffect(() => {
+    const token = Cookies.get("authToken");
+    if (token) {
+      setIsLoggedIn(true);
+    }
+  }, []);
+
+  const handleFetchQuestion = (questionData: QuestionData) => {
+    setQuizData(questionData);
+  };
+
+  const handleLogOut = () => {
+    setIsLoggedIn(false);
+    Cookies.remove("authToken");
+  };
+
+  const handleLogin = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setIsLoggedIn(true);
+  };
+
   return (
     <Router>
       <Routes>
         <Route
           path="/"
           element={
-            <div>
+            <>
               <GoHome />
               <h1>Welcome to the Quiz</h1>
-              <StartButton />
-              {!isLoggedIn && <Login onSubmit={() => setIsLoggedIn(true)} />}
-              <SignUpForm />
-            </div>
+              <StartQuiz onFetchQuestion={handleFetchQuestion} />
+              {!isLoggedIn && <Login onSubmit={handleLogin} />}
+              {isLoggedIn && <LogOut onLogOut={handleLogOut} />}
+              {!isLoggedIn && <SignUp />}
+            </>
           }
         />
-        <Route
-          path="/q/:id"
-          element={isLoggedIn ? <QuizCard /> : <Navigate to="" replace />}
-        />
+        <Route element={<PrivateRoute isLoggedIn={isLoggedIn} />}>
+          <Route
+            path="/api/random"
+            element={<QuizCard quizData={quizData} />}
+          />
+        </Route>
+        <Route path="/login" element={<Login onSubmit={handleLogin} />} />
       </Routes>
     </Router>
   );
-}
+};
 
 export default App;

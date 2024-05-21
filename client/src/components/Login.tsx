@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import axios from "axios";
 import ErrorModal from "../modals/ErrorModal";
+import Cookies from "js-cookie";
 
-interface LoginProps {
+export interface LoginProps {
   onSubmit: (
     event: React.FormEvent<HTMLFormElement>,
     username: string,
@@ -10,7 +11,7 @@ interface LoginProps {
   ) => void;
 }
 
-const Login: React.FunctionComponent<LoginProps> = () => {
+const Login: React.FunctionComponent<LoginProps> = ({ onSubmit }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
@@ -25,11 +26,12 @@ const Login: React.FunctionComponent<LoginProps> = () => {
         "http://localhost:3000/api/login",
         { username, password },
       );
+      const token = response.data.token;
+      Cookies.set("authToken", token, { expires: 1 });
       console.log("Username: ", username);
       console.log("Password: ", password);
       console.log("Response: ", response);
-      setUsername("");
-      setPassword("");
+      onSubmit(event, username, password);
     } catch (error) {
       console.error("Error: ", error);
       setErrorMessage("Login failed");

@@ -1,13 +1,32 @@
+import React from "react";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { QuestionData } from "../types/types";
 
-const StartQuiz = () => {
+interface StartQuizProps {
+  onFetchQuestion: (questionData: QuestionData) => void;
+}
+
+const StartQuiz: React.FC<StartQuizProps> = ({ onFetchQuestion }) => {
   const navigate = useNavigate();
 
-  const handleStartQuiz = () => {
-    navigate("/q/1");
+  const handleStartQuiz = async () => {
+    try {
+      const response = await axios.get<QuestionData>(
+        "http://localhost:3000/api/random",
+      );
+      onFetchQuestion(response.data);
+      navigate("/api/random/");
+    } catch (error) {
+      console.error("Error fetching random question:", error);
+    }
   };
 
-  return <button onClick={handleStartQuiz}>Start Quiz</button>;
+  return (
+    <div>
+      <button onClick={handleStartQuiz}>Start Quiz</button>
+    </div>
+  );
 };
 
 export default StartQuiz;

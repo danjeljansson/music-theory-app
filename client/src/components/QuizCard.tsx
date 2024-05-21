@@ -1,50 +1,36 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { AnswerOption, QuestionData } from "../types/types";
 import { useParams } from "react-router-dom";
 import NextQuestion from "./NextQuestion.tsx";
-import GoHome from "./Home.tsx";
-import RandomQuiz from "./RandomQuestion.tsx";
-
-interface AnswerOption {
-  id: string;
-  text: string;
-}
-
-export interface QuestionData {
-  id: string;
-  question: string;
-  totalQuestions: number;
-  correctAnswer: number;
-  userAnswer: null;
-  questionImage: string;
-  answerOptions: AnswerOption[];
-}
 
 interface QuizCardProps {
-  quizData: QuestionData;
+  quizData: QuestionData | null;
 }
 
-const QuizCard: React.FunctionComponent<QuizCardProps> = ({ quizData }) => {
+const QuizCard: React.FunctionComponent<QuizCardProps> = () => {
+  const [quizData, setQuizData] = useState<QuestionData>();
   const { id } = useParams<{ id: string }>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchQuizData = async () => {
+    const fetchRandomQuestion = async () => {
       try {
-        const response = await axios.get<QuizCardProps>(
-          `http://localhost:3000/api/random`,
+        const response = await axios.get<QuestionData>(
+          "http://localhost:3000/api/random",
         );
-        console.log("Quiz data response:", response);
+        console.log("Response data:", response.data);
+        setQuizData(response.data);
+        setLoading(false);
       } catch (error) {
-        console.error("Error fetching quiz data:", error);
-        setError("Failed to load quiz data");
-      } finally {
+        console.error("Error fetching random question:", error);
+        setError("Failed to fetch random question");
         setLoading(false);
       }
     };
 
-    fetchQuizData().then(
+    fetchRandomQuestion().then(
       () => {
         console.log("Quiz data fetched");
       },
@@ -60,7 +46,7 @@ const QuizCard: React.FunctionComponent<QuizCardProps> = ({ quizData }) => {
 
   return (
     <>
-      {quizData && (
+      {quizData && quizData.answerOptions && (
         <ul>
           <QuizCardItem
             id={quizData.id}
@@ -77,12 +63,14 @@ const QuizCard: React.FunctionComponent<QuizCardProps> = ({ quizData }) => {
   );
 };
 
-const QuizCardItem: React.FC<QuestionData> = ({
-  question,
-  answerOptions,
+const QuizCardItem: React.FunctionComponent<QuestionData> = ({
   id,
-  questionImage,
+  question,
   totalQuestions,
+  correctAnswer,
+  userAnswer,
+  questionImage,
+  answerOptions,
 }) => {
   const handleAnswerClick = (
     answerOptionId: string,
@@ -94,15 +82,12 @@ const QuizCardItem: React.FC<QuestionData> = ({
 
   return (
     <>
-      <GoHome />
       <NextQuestion currentQuestion={id} totalQuestions={totalQuestions} />
       <div>
         <h2 dangerouslySetInnerHTML={{ __html: question }}></h2>
-        {questionImage && (
-          <img src={questionImage} alt="Question" className="size-20" />
-        )}
+        {questionImage && <img src={questionImage} alt="Question" />}
         <ul>
-          {answerOptions.map((option) => (
+          {answerOptions?.map((option: AnswerOption) => (
             <li key={option.id}>
               <button
                 onClick={(event: React.MouseEvent<HTMLButtonElement>) =>
