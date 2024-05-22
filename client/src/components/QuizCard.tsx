@@ -1,27 +1,26 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { AnswerOption, QuestionData } from "../types/types";
-import { useParams } from "react-router-dom";
-import NextQuestion from "./NextQuestion.tsx";
+// import { useParams } from "react-router-dom";
 
 interface QuizCardProps {
   quizData?: QuestionData;
 }
 
-const QuizCard: React.FunctionComponent<QuizCardProps> = () => {
-  const [quizData, setQuizData] = useState<QuestionData>([]);
-  const { id } = useParams<{ id: string }>();
+const QuizCard: React.FunctionComponent<QuizCardProps> = ({ quizData }) => {
+  const [question, setQuestion] = useState<QuestionData>();
+  // const { id } = useParams<{ id: string }>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchRandomQuestion = async () => {
       try {
-        const response = await axios.get<QuestionData>(
-          "http://localhost:3000/api/random",
-        );
+        const response = await axios.get<{
+          question: QuestionData;
+        }>("http://localhost:3000/api/random");
         console.log("Response data:", response.data);
-        setQuizData(response.data);
+        setQuestion(response.data.question);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching random question:", error);
@@ -30,15 +29,7 @@ const QuizCard: React.FunctionComponent<QuizCardProps> = () => {
       }
     };
 
-    fetchRandomQuestion().then(
-      () => {
-        console.log("Quiz data fetched");
-      },
-      (error) => {
-        console.error("Error fetching quiz data:", error);
-        setError("Failed to load quiz data");
-      },
-    );
+    fetchRandomQuestion();
   }, []);
 
   if (loading) return <div>Loading...</div>;
@@ -46,15 +37,14 @@ const QuizCard: React.FunctionComponent<QuizCardProps> = () => {
 
   return (
     <>
-      {quizData && quizData.answerOptions && (
+      {quizData && question && question.question && (
         <QuizCardItem
           id={quizData.id}
           question={quizData.question}
-          totalQuestions={quizData.totalQuestions}
-          correctAnswer={quizData.correctAnswer}
-          userAnswer={quizData.userAnswer}
-          questionImage={quizData.questionImage}
-          answerOptions={quizData.answerOptions}
+          // totalQuestions={quizSession.totalQuestions}
+          // correctAnswers={quizSession.correctAnswers}
+          // currentQuestion={quizSession.currentQuestion}
+          answers={quizData.answers}
         />
       )}
     </>
@@ -64,45 +54,42 @@ const QuizCard: React.FunctionComponent<QuizCardProps> = () => {
 const QuizCardItem: React.FunctionComponent<QuestionData> = ({
   id,
   question,
-  totalQuestions,
-  correctAnswer,
-  userAnswer,
-  questionImage,
-  answerOptions,
+  // totalQuestions,
+  // correctAnswers,
+  // currentQuestion,
+  answers,
 }) => {
   console.log("QuizCardItem props:", {
     id,
     question,
-    totalQuestions,
-    correctAnswer,
-    userAnswer,
-    questionImage,
-    answerOptions,
+    // totalQuestions,
+    // correctAnswers,
+    // currentQuestion,
+    answers,
   });
 
   const handleAnswerClick = (
     answerOptionId: string,
     event: React.MouseEvent<HTMLButtonElement>,
   ) => {
-    console.log(`Answer ${answerOptionId} clicked`);
+    console.log("Answer clicked:", answerOptionId);
     event.preventDefault();
   };
 
   return (
     <>
-      <NextQuestion currentQuestion={id} totalQuestions={totalQuestions} />
+      {/*<NextQuestion currentQuestion={id} totalQuestions={totalQuestions} />*/}
       <div>
         <h2 dangerouslySetInnerHTML={{ __html: question }}></h2>
-        {questionImage && <img src={questionImage} alt="Question" />}
         <ul>
-          {answerOptions.map((option: AnswerOption) => (
+          {answers.map((option: AnswerOption) => (
             <li key={option.id}>
               <button
                 onClick={(event: React.MouseEvent<HTMLButtonElement>) =>
                   handleAnswerClick(option.id, event)
                 }
               >
-                <span dangerouslySetInnerHTML={{ __html: option.text }} />
+                {option.answerOption}
               </button>
             </li>
           ))}

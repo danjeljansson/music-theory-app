@@ -10,9 +10,14 @@ import PrivateRoute from "./components/PrivateRoute";
 import SignUp from "./components/SignUp";
 import GoHome from "./components/Home.tsx";
 
-const App: React.FC = () => {
+const App: React.FunctionComponent = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [quizData, setQuizData] = useState<QuestionData | null>(null);
+  const [quizData, setQuizData] = useState<QuestionData>();
+  // const [quizSession, setQuizSession] = useState<QuizSession>({
+  //   currentQuestion: 0,
+  //   totalQuestions: 0,
+  //   correctAnswers: 0,
+  // });
 
   useEffect(() => {
     const token = Cookies.get("authToken");
