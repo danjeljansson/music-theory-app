@@ -2,11 +2,11 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 
 interface NextQuestionProps {
-  currentQuestion: number;
+  currentQuestion: string | number;
   totalQuestions: number;
 }
 
-const NextQuestion: React.FC<NextQuestionProps> = ({
+const NextQuestion: React.FunctionComponent<NextQuestionProps> = ({
   currentQuestion,
   totalQuestions,
 }) => {

@@ -5,11 +5,11 @@ import { useParams } from "react-router-dom";
 import NextQuestion from "./NextQuestion.tsx";
 
 interface QuizCardProps {
-  quizData: QuestionData | null;
+  quizData?: QuestionData;
 }
 
 const QuizCard: React.FunctionComponent<QuizCardProps> = () => {
-  const [quizData, setQuizData] = useState<QuestionData>();
+  const [quizData, setQuizData] = useState<QuestionData>([]);
   const { id } = useParams<{ id: string }>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -39,7 +39,7 @@ const QuizCard: React.FunctionComponent<QuizCardProps> = () => {
         setError("Failed to load quiz data");
       },
     );
-  }, [id]);
+  }, []);
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
@@ -47,17 +47,15 @@ const QuizCard: React.FunctionComponent<QuizCardProps> = () => {
   return (
     <>
       {quizData && quizData.answerOptions && (
-        <ul>
-          <QuizCardItem
-            id={quizData.id}
-            question={quizData.question}
-            totalQuestions={quizData.totalQuestions}
-            correctAnswer={quizData.correctAnswer}
-            userAnswer={quizData.userAnswer}
-            questionImage={quizData.questionImage}
-            answerOptions={quizData.answerOptions}
-          />
-        </ul>
+        <QuizCardItem
+          id={quizData.id}
+          question={quizData.question}
+          totalQuestions={quizData.totalQuestions}
+          correctAnswer={quizData.correctAnswer}
+          userAnswer={quizData.userAnswer}
+          questionImage={quizData.questionImage}
+          answerOptions={quizData.answerOptions}
+        />
       )}
     </>
   );
@@ -72,6 +70,16 @@ const QuizCardItem: React.FunctionComponent<QuestionData> = ({
   questionImage,
   answerOptions,
 }) => {
+  console.log("QuizCardItem props:", {
+    id,
+    question,
+    totalQuestions,
+    correctAnswer,
+    userAnswer,
+    questionImage,
+    answerOptions,
+  });
+
   const handleAnswerClick = (
     answerOptionId: string,
     event: React.MouseEvent<HTMLButtonElement>,
@@ -87,7 +95,7 @@ const QuizCardItem: React.FunctionComponent<QuestionData> = ({
         <h2 dangerouslySetInnerHTML={{ __html: question }}></h2>
         {questionImage && <img src={questionImage} alt="Question" />}
         <ul>
-          {answerOptions?.map((option: AnswerOption) => (
+          {answerOptions.map((option: AnswerOption) => (
             <li key={option.id}>
               <button
                 onClick={(event: React.MouseEvent<HTMLButtonElement>) =>
