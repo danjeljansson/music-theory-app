@@ -6,6 +6,10 @@ import ajvValidateIdParam from "../validator/id-param";
 import ajvValidate from "../validator/quiz-validator";
 import validateDto from "../middleware/validate-dto";
 import authenticateToken from "../validator/cookie-validate";
+import {
+  validatePostData,
+  validateGetData,
+} from "../validator/session-validator";
 import logActiveUser from "../middleware/UserActivity";
 
 const router = express.Router();
@@ -18,7 +22,11 @@ router.get("/all/:id", ajvValidateIdParam, QuizController.getById);
 
 router.get("/random", QuizController.getRandomQuestion);
 
+router.get("/quiz", QuizController.getSession);
+
 router.post("/create", validateDto(ajvValidate), QuizController.createQuestion);
+
+router.post("/bulk-create", validatePostData, QuizController.createQuestions);
 
 router.delete("/delete/:id", ajvValidateIdParam, QuizController.deleteById);
 

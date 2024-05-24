@@ -29,7 +29,7 @@ QuestionInstance.init(
   {
     sequelize: db,
     freezeTableName: true,
-    modelName: "question",
+    modelName: "questions",
   },
 );
 

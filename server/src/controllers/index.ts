@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
 import { QuestionInstance, AnswerInstance } from "../model/Association";
+import { Sequelize } from "sequelize";
 
 interface Answer {
   answerOption: string;
@@ -14,13 +15,11 @@ class QuizController {
     try {
       console.log("Incoming answer:", answerText);
 
-      // Create the question
       const question = await QuestionInstance.create({
         id: uuidv4(),
         question: questionText,
       });
 
-      // Ensure 'answerText' is an array
       if (Array.isArray(answerText)) {
         const createdAnswers = await Promise.all(
           answerText.map(async (answer: Answer) => {
@@ -36,18 +35,110 @@ class QuizController {
       } else {
         throw new Error("Answers must be provided as an array");
       }
-
-      // Parse each answer option and create AnswerInstances
     } catch (e) {
       console.error("Error creating question:", e);
       res.status(500).json({ msg: "failed", route: "/create", error: e });
     }
   }
 
+  async createQuestions(req: Request, res: Response) {
+    const { questions } = req.body;
+
+    if (!Array.isArray(questions)) {
+      return res
+        .status(400)
+        .json({ msg: "Questions must be provided as an array" });
+    }
+
+    try {
+      const createdQuestions = await Promise.all(
+        questions.map(async (questionData: any) => {
+          const { question: questionText, answer: answerText } = questionData;
+
+          const question = await QuestionInstance.create({
+            id: uuidv4(),
+            question: questionText,
+          });
+
+          if (Array.isArray(answerText)) {
+            const createdAnswers = await Promise.all(
+              answerText.map(async (answer: any) => {
+                return await AnswerInstance.create({
+                  id: uuidv4(),
+                  questionId: question.id,
+                  answerOption: answer.answerOption,
+                  isCorrect: answer.isCorrect,
+                });
+              }),
+            );
+
+            return { question, answers: createdAnswers };
+          } else {
+            throw new Error("Answers must be provided as an array");
+          }
+        }),
+      );
+
+      res.json({ createdQuestions, msg: "Success" });
+    } catch (e) {
+      console.error("Error creating questions:", e);
+      res.status(500).json({
+        msg: "Failed to create questions",
+        route: "/bulk-create",
+        error: e,
+      });
+    }
+  }
+
+  async getRandomQuestion(req: Request, res: Response) {
+    try {
+      const totalQuestions = await QuestionInstance.count();
+      const randomIndex = Math.floor(Math.random() * totalQuestions);
+
+      const randomQuestion = await QuestionInstance.findOne({
+        offset: randomIndex,
+        attributes: ["id", "question"],
+        include: [{ model: AnswerInstance, as: "answers" }],
+      });
+
+      if (!randomQuestion) {
+        return res.status(404).json({ msg: "No questions found" });
+      }
+
+      res.json({ question: randomQuestion, msg: "Success" });
+    } catch (error) {
+      console.error("Error fetching random question:", error);
+      res.status(500).json({ msg: "Failed to fetch random question" });
+    }
+  }
+
+  async getSession(req: Request, res: Response) {
+    try {
+      const quizSession = await QuestionInstance.findAll({
+        include: [
+          {
+            model: AnswerInstance,
+            as: "answers",
+          },
+        ],
+        order: Sequelize.literal("RANDOM()"),
+        limit: 10,
+      });
+
+      if (!quizSession) {
+        return res.status(404).json({ msg: "No questions found" });
+      }
+      res.status(200).json(quizSession);
+    } catch (error) {
+      console.error("Error fetching questions:", error);
+      res.status(500).json({ msg: "Failed to fetch questions", error });
+    }
+  }
+
   async getPagination(req: Request, res: Response) {
     try {
       const page = parseInt(req.query.page as string) || 0;
-      const size = parseInt(req.query.size as string) || 10;
+      const size = parseInt(req.query.size as string) || 5;
       const offset = page * size;
       if (isNaN(page) || isNaN(size)) {
         return res.status(400).json({
@@ -80,28 +171,6 @@ class QuizController {
       res.json({ question, msg: "Success" });
     } catch (e) {
       res.status(500).json({ msg: "failed", route: "/all:id" });
-    }
-  }
-
-  async getRandomQuestion(req: Request, res: Response) {
-    try {
-      const totalQuestions = await QuestionInstance.count();
-      const randomIndex = Math.floor(Math.random() * totalQuestions);
-
-      const randomQuestion = await QuestionInstance.findOne({
-        offset: randomIndex,
-        attributes: ["id", "question"],
-        include: [{ model: AnswerInstance, as: "answers" }],
-      });
-
-      if (!randomQuestion) {
-        return res.status(404).json({ msg: "No questions found" });
-      }
-
-      res.json({ question: randomQuestion, msg: "Success" });
-    } catch (error) {
-      console.error("Error fetching random question:", error);
-      res.status(500).json({ msg: "Failed to fetch random question" });
     }
   }
 
