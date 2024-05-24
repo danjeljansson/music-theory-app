@@ -13,10 +13,10 @@ const StartQuiz: React.FC<StartQuizProps> = ({ onFetchQuestion }) => {
   const handleStartQuiz = async () => {
     try {
       const response = await axios.get<QuestionData>(
-        "http://localhost:3000/api/random",
+        "http://localhost:3000/api/quiz",
       );
       onFetchQuestion(response.data);
-      navigate("/api/random/");
+      navigate("/api/quiz/");
     } catch (error) {
       console.error("Error fetching random question:", error);
     }

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Cookies from "js-cookie";
-import { QuestionData } from "./types/types";
+import { QuestionData, QuizSession } from "./types/types";
 import StartQuiz from "./components/StartQuiz";
 import QuizCard from "./components/QuizCard";
 import Login from "./components/Login";
@@ -13,11 +13,11 @@ import GoHome from "./components/Home.tsx";
 const App: React.FunctionComponent = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [quizData, setQuizData] = useState<QuestionData>();
-  // const [quizSession, setQuizSession] = useState<QuizSession>({
-  //   currentQuestion: 0,
-  //   totalQuestions: 0,
-  //   correctAnswers: 0,
-  // });
+  const [quizSession, setQuizSession] = useState<QuizSession>({
+    currentQuestion: 0,
+    totalQuestions: 0,
+    correctAnswers: 0,
+  });
 
   useEffect(() => {
     const token = Cookies.get("authToken");
@@ -57,10 +57,7 @@ const App: React.FunctionComponent = () => {
           }
         />
         <Route element={<PrivateRoute isLoggedIn={isLoggedIn} />}>
-          <Route
-            path="/api/random"
-            element={<QuizCard quizData={quizData} />}
-          />
+          <Route path="/api/quiz" element={<QuizCard quizData={quizData} />} />
         </Route>
         <Route path="/login" element={<Login onSubmit={handleLogin} />} />
       </Routes>

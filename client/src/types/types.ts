@@ -1,12 +1,27 @@
 export interface AnswerOption {
   id: string;
   answerOption: string;
+  isCorrect: boolean;
 }
 
+export interface AnswerObject {
+  question: string;
+  answer: string;
+  correct: boolean;
+  correctAnswer: string;
+}
+
+// export interface QuizSession {
+//   currentQuestion: number;
+//   totalQuestions: number;
+//   correctAnswers: number;
+// }
+
 export interface QuizSession {
-  currentQuestion: number;
+  currentQuestionIndex: number;
   totalQuestions: number;
   correctAnswers: number;
+  questions: QuestionData[];
 }
 
 export interface QuestionData {
